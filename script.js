@@ -5,9 +5,9 @@ kaboom();
 
 // Load sprites (ensure the paths are correct)
 loadBean()
-loadSprite("rifle", "sprites/Icons/rifle1.png"); // Correct relative path to rifle sprite
-loadSprite("inventory", "sprites/Icons/minecraft-inventory-png-4.jpg");
-loadSprite("background", "sprites/Icons/your mom.jpg");
+loadSprite("rifle", "./sprites/Icons/rifle1.png"); // Correct relative path to rifle sprite
+loadSprite("inventory", "./sprites/Icons/minecraft-inventory-png-4.jpg");
+loadSprite("background", "./sprites/Icons/your mom.jpg");
 
 // Scene "one"
 scene("one", () => {
