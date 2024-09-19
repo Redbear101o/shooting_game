@@ -7,7 +7,31 @@ kaboom();
 loadBean()
 loadSprite("rifle", "./sprites/Icons/rifle1.png"); // Correct relative path to rifle sprite
 loadSprite("inventory", "./sprites/Icons/minecraft-inventory-png-4.jpg");
-loadSprite("background", "./sprites/Icons/your mom.jpg");
+loadSprite("background", "./sprites/other/create-vector-2d-game-background-for-your-game.png");
+loadSprite("caseoh", "sprites/Icons/OIP.jpg");
+loadSound("gunshot", "sounds/single-gunshot-6-101876_gUpzQ8DB.mp3")
+loadSprite("title", "sprites/other/start-game-button-on-abstract-background-with-crystals-vector.jpg");
+loadSound("music", "sounds/pixel-fight-8-bit-arcade-music-background-music-for-video-208775.mp3", {
+    loop: true
+});
+loadSprite("boss", "sprite sheets/glitch_walker-removebg-preview.png", {
+    sliceX: 8,
+    sliceY: 2,
+    anims: {
+        "idle": {
+            from: 0,
+            to: 0
+        },
+        "walk": {
+            from: 0,
+            to: 15,
+            loop: true
+        }
+    }
+})
+loadSound("fart", "sprites/other/fart-83471.mp3")
+
+play("music")
 
 // Scene "one"
 scene("one", () => {
@@ -15,9 +39,8 @@ scene("one", () => {
     const gravity = 1600;
     let bullets = []
     add([
-        sprite("background"),
+        sprite("background", { width: width(), height: height()}),
         pos(0,0),
-        scale(3)
     ]);
     // Add player
     const player = add([
@@ -27,11 +50,23 @@ scene("one", () => {
         body()
     ]);
 
+    const target = add([
+        sprite("caseoh"),
+        pos(500, 80),
+        area()
+    ]);
+
+
+    target.onCollide("bullet", (bullet)=>{
+        bullet.destroy()
+        target.destroy()
+        play("fart")
+    })
     // Add ground
     add([
-        rect(width(), 40),
-        color(0, 0, 0),
-        pos(0, height() - 40),
+        rect(width(), height()/10),
+        opacity(0),
+        pos(0, height() - height()/6),
         area(),
         body({ isStatic: true })
     ]);
@@ -60,12 +95,14 @@ scene("one", () => {
 
     // Player controls
     onKeyDown("a", () => {
-        player.move(-SPEED, 0);
+        if (player.pos.x > 100)
+            player.move(-SPEED, 0);
         rifle.flipX = true
     });
 
     onKeyDown("d", () => {
-        player.move(SPEED, 0);
+        if (player.pos.x < width())
+            player.move(SPEED, 0);
         rifle.flipX = false
     });
 
@@ -76,10 +113,13 @@ scene("one", () => {
     });
 
     onMousePress(()=>{
+        play("gunshot")
         bullets.push([add([
             circle(3),
             pos(rifle.pos),
-            color(0,0,0)
+            color(0,0,0),
+            area(),
+            "bullet"
         ]), rifle.flipX])
     })
 
@@ -92,10 +132,10 @@ scene("one", () => {
         rifle.pos = player.pos;
         for(let i=0;i<bullets.length;i++){
             if(bullets[i][1] === true){
-                bullets[i][0].move(-100, 0)
+                bullets[i][0].move(-500, 0)
             }
             else{
-                bullets[i][0].move(100, 0)
+                bullets[i][0].move(500, 0)
             }
             if(bullets[i][0].pos.x < 0 || bullets[i][0].pos.x > width()){
                 bullets[i][0].destroy()
@@ -108,6 +148,7 @@ scene("one", () => {
 scene("two", () => {
     const SPEED = 300;
     const gravity = 1600;
+    let bullets = []
     let inventoryOpen = false;
     let i = add([
         sprite("inventory"),
@@ -116,9 +157,8 @@ scene("two", () => {
     ]);
 
     add([
-        sprite("background"),
+        sprite("background", { width: width(), height: height()}),
         pos(0,0),
-        scale(3)
     ]);
 
     // Add player
@@ -131,9 +171,9 @@ scene("two", () => {
 
     // Add ground
     add([
-        rect(width(), 40),
-        color(0, 0, 0),
-        pos(0, height() - 40),
+        rect(width(), height()/10),
+        opacity(0),
+        pos(0, height() - height()/6),
         area(),
         body({ isStatic: true })
     ]);
@@ -141,9 +181,10 @@ scene("two", () => {
     // Add rifle
     const rifle = add([
         sprite("rifle"),
-        pos(1, 2),
-        scale(1.5),
-        rotate(45)
+        anchor("center"),
+        pos(20, 0),
+        scale(.3),
+        rotate(0)
 
     ]);
 
@@ -165,18 +206,29 @@ scene("two", () => {
         body({ isStatic: true })
     ]);
 
+    const b = add([
+        sprite("boss"),
+        pos(width()-200,0),
+        area(),
+        body()
+    ])
+    b.flipX = true
+    b.play("walk")
+
 
     // Set gravity
     setGravity(gravity);
 
     // Player controls
     onKeyDown("a", () => {
-        player.move(-SPEED, 0);
+        if (player.pos.x > 100)
+            player.move(-SPEED, 0);
         rifle.flipX = true;
     });
 
     onKeyDown("d", () => {
-        player.move(SPEED, 0);
+        if (player.pos.x < width()-100)
+            player.move(SPEED, 0);
         rifle.flipX = false;
     });
 
@@ -186,6 +238,16 @@ scene("two", () => {
         }
     });
 
+    onMousePress(()=>{
+        bullets.push([add([
+            circle(3),
+            pos(rifle.pos),
+            color(0,0,0),
+            area(),
+            "bullet"
+        ]), rifle.flipX])
+    })
+
     onKeyPress("e", () => {
         if (inventoryOpen) {
             inventoryOpen = false
@@ -194,13 +256,50 @@ scene("two", () => {
             inventoryOpen = true
         }
     });
-
+    b.onCollide("bullet", ()=>{
+        b.destroy()
+        play("fart")
+    })
     // Update action
     onUpdate(() => {
         rifle.pos = player.pos;
-        
+        for(let i=0;i<bullets.length;i++){
+            if(bullets[i][1] === true){
+                bullets[i][0].move(-500, 0)
+            }
+            else{
+                bullets[i][0].move(500, 0)
+            }
+            if(bullets[i][0].pos.x < 0 || bullets[i][0].pos.x > width()){
+                bullets[i][0].destroy()
+            }
+        }
+        b.move(-100, 0)
     });
 });
 
+
+// title scene
+scene("title", ()=>{
+    add([
+        sprite("title", { width: width(), height: height()}),
+        pos(0,0),
+    ]);
+
+    const submit_button = add([
+        rect(width()/2.7, height()/7),
+        pos(width()/3.1, height()/2.1),
+        opacity(0),
+        area(),
+        "submit"
+    ]);
+
+    onClick("submit",()=>{
+        go("one")
+    })
+})
+
+
+
 // Start with scene "one"
-go("one");
+go("title");
