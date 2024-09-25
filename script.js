@@ -5,9 +5,9 @@ kaboom();
 
 // Load sprites (ensure the paths are correct)
 loadBean()
-loadSprite("rifle", "./sprites/Icons/rifle1.png"); // Correct relative path to rifle sprite
-loadSprite("inventory", "./sprites/Icons/minecraft-inventory-png-4.jpg");
-loadSprite("background", "./sprites/other/create-vector-2d-game-background-for-your-game.png");
+loadSprite("rifle", "sprites/Icons/rifle1.png"); // Correct relative path to rifle sprite
+loadSprite("inventory", "sprites/Icons/minecraft-inventory-png-4.jpg");
+loadSprite("background", "sprites/other/create-vector-2d-game-background-for-your-game.png");
 loadSprite("caseoh", "sprites/Icons/OIP.jpg");
 loadSound("gunshot", "sounds/single-gunshot-6-101876_gUpzQ8DB.mp3")
 loadSprite("title", "sprites/other/start-game-button-on-abstract-background-with-crystals-vector.jpg");
